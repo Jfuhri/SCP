@@ -7,12 +7,15 @@ public class FirstPersonShooter : MonoBehaviour
     public float bulletForce = 700f;
     public Camera playerCamera;
     public float shootCooldown = 0.5f;
+    public bool isAutomatic = false; //  Set this in the inspector or from weapon data
 
     private float lastShotTime = 0f;
 
     void Update()
     {
-        if (Input.GetButtonDown("Fire1") && Time.time >= lastShotTime + shootCooldown)
+        bool firePressed = isAutomatic ? Input.GetButton("Fire1") : Input.GetButtonDown("Fire1");
+
+        if (firePressed && Time.time >= lastShotTime + shootCooldown)
         {
             Shoot();
             lastShotTime = Time.time;
