@@ -33,14 +33,15 @@ public class WeaponLoader : MonoBehaviour
 
         if (activeWeapon != null && Camera.main != null)
         {
-            // Get base rotation toward camera
             Quaternion lookRot = Quaternion.LookRotation(Camera.main.transform.forward);
 
-            // Apply correction — adjust as needed for your model
-            Quaternion modelOffset = Quaternion.Euler(0, 90, 0); // Example: rotates model to face camera's forward
+            // Get offset if it exists
+            WeaponInfo info = activeWeapon.GetComponent<WeaponInfo>();
+            Quaternion offsetRot = Quaternion.Euler(info != null ? info.rotationOffsetEuler : Vector3.zero);
+
             activeWeapon.transform.rotation = Quaternion.Lerp(
                 activeWeapon.transform.rotation,
-                lookRot * modelOffset,
+                lookRot * offsetRot,
                 Time.deltaTime * 10f
             );
         }

@@ -9,6 +9,7 @@ public class ShotgunShooter : MonoBehaviour
     public float spreadAngle = 5f; // Degrees
     public float pelletForce = 700f;
     public float shootCooldown = 1f;
+    public MuzzleFlashSpawner muzzleFlashSpawner;
 
     private float lastShotTime = 0f;
 
@@ -34,6 +35,8 @@ public class ShotgunShooter : MonoBehaviour
                 rb.linearVelocity = direction * pelletForce * Time.fixedDeltaTime;
                 pellet.transform.forward = direction;
             }
+            if (muzzleFlashSpawner != null)
+                muzzleFlashSpawner.SpawnFlash();
         }
     }
 

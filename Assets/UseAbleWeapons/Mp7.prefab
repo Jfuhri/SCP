@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 1464796637919424765}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.2586, y: 0.5819, z: 2.4232}
+  m_LocalPosition: {x: -0.2586, y: 0.5819, z: 2.507}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -53,15 +53,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6e9def8d3026b9741b10ae42ec9b31ae, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 25.71322
+      value: 31.291729
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6e9def8d3026b9741b10ae42ec9b31ae, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 2.69
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6e9def8d3026b9741b10ae42ec9b31ae, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -6.181142
+      value: -24.173836
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6e9def8d3026b9741b10ae42ec9b31ae, type: 3}
       propertyPath: m_LocalRotation.w
@@ -97,7 +97,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 6e9def8d3026b9741b10ae42ec9b31ae, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -122,7 +122,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3551031870909652793}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 261c1247fbbc943459199626cb01e171, type: 3}
   m_Name: 
@@ -132,6 +132,7 @@ MonoBehaviour:
   bulletForce: 3000
   playerCamera: {fileID: 0}
   shootCooldown: 0.5
+  isAutomatic: 1
 --- !u!4 &4182748943351367043 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 6e9def8d3026b9741b10ae42ec9b31ae, type: 3}
