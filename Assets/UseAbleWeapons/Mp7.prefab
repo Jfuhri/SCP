@@ -97,7 +97,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 6e9def8d3026b9741b10ae42ec9b31ae, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -127,12 +127,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 261c1247fbbc943459199626cb01e171, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletPrefab: {fileID: 6720117809425027844, guid: 991f41718d5a14b46b49ddb9cc420c52, type: 3}
+  bulletPrefab: {fileID: 4125305884771995060, guid: 322f86d9420420c429dfc44db74b180c, type: 3}
   bulletSpawnPoint: {fileID: 8585275583441712841}
   bulletForce: 3000
   playerCamera: {fileID: 0}
-  shootCooldown: 0.5
+  shootCooldown: 0.15
   isAutomatic: 1
+  muzzleFlashSpawner: {fileID: 0}
 --- !u!4 &4182748943351367043 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 6e9def8d3026b9741b10ae42ec9b31ae, type: 3}

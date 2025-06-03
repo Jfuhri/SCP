@@ -139,8 +139,9 @@ MonoBehaviour:
   bulletSpawnPoint: {fileID: 1797157295030275066}
   bulletForce: 3000
   playerCamera: {fileID: 0}
-  shootCooldown: 0.5
+  shootCooldown: 0.25
   isAutomatic: 1
+  muzzleFlashSpawner: {fileID: 0}
 --- !u!114 &4471754448980936992
 MonoBehaviour:
   m_ObjectHideFlags: 0

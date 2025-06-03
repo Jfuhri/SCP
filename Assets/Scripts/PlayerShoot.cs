@@ -7,8 +7,9 @@ public class FirstPersonShooter : MonoBehaviour
     public float bulletForce = 700f;
     public Camera playerCamera;
     public float shootCooldown = 0.5f;
-    public bool isAutomatic = false; //  Set this in the inspector or from weapon data
+    public bool isAutomatic = false; // Set this in the inspector or from weapon data
     public MuzzleFlashSpawner muzzleFlashSpawner;
+
     private float lastShotTime = 0f;
 
     void Update()
@@ -37,7 +38,12 @@ public class FirstPersonShooter : MonoBehaviour
             rb.linearVelocity = shootDirection * bulletForce * Time.fixedDeltaTime;
             bullet.transform.forward = shootDirection;
         }
+
+        // Spawn muzzle flash
         if (muzzleFlashSpawner != null)
             muzzleFlashSpawner.SpawnFlash();
+
+        //  Broadcast the gunshot event
+        GlobalEventManager.ReportGunshot(bulletSpawnPoint.position);
     }
 }

@@ -1,29 +1,48 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Health : MonoBehaviour
 {
-    public float currentHealth = 100f;
-    [HideInInspector]
-    public float armor = 0f; // This is now set by ArmorSystem
+    public float maxHealth = 100f;
+    private float currentHealth;
+
+    void Start()
+    {
+        currentHealth = maxHealth;
+    }
 
     public void TakeDamage(float amount)
     {
-        // Apply armor reduction (armor is subtracted from incoming damage, clamped to minimum 0)
-        float damageAfterArmor = Mathf.Max(amount - armor, 0f);
+        currentHealth -= amount;
 
-        currentHealth -= damageAfterArmor;
-
-        Debug.Log($"{gameObject.name} took {damageAfterArmor} damage after armor ({armor}). Remaining health: {currentHealth}");
-
-        if (currentHealth <= 0f)
+        if (currentHealth <= 0)
         {
             Die();
         }
     }
 
-    void Die()
+    private void Die()
     {
-        Debug.Log($"{gameObject.name} has died.");
-        Destroy(gameObject); // Replace with death animation or logic if needed
+        // Example behavior: destroy enemy or reload scene for player
+        if (CompareTag("Player"))
+        {
+            // Load game over scene for player death
+            SceneManager.LoadScene("GameOver");
+        }
+        else
+        {
+            // Destroy enemy object
+            Destroy(gameObject);
+        }
+    }
+
+    public float GetHealth()
+    {
+        return currentHealth;
+    }
+
+    public float GetMaxHealth()
+    {
+        return maxHealth;
     }
 }

@@ -5,16 +5,16 @@ public class ShotgunPellet : MonoBehaviour
     [Header("Damage Settings")]
     public float damage = 5f;
     public float lifetime = 2f;
-    public float collisionActivationDelay = 0.05f; // Delay before pellet can detect collisions
+    public float collisionActivationDelay = 0.05f; // Delay to prevent self-collision
 
     private bool canCollide = false;
 
     void Start()
     {
-        // Allow collision after a short delay to avoid self-collisions
+        // Delay collision detection to avoid hitting the shooter
         Invoke(nameof(EnableCollision), collisionActivationDelay);
 
-        // Destroy the pellet after its lifetime expires
+        // Destroy the pellet after it has existed long enough
         Destroy(gameObject, lifetime);
     }
 
@@ -27,13 +27,13 @@ public class ShotgunPellet : MonoBehaviour
     {
         if (!canCollide) return;
 
-        // Try to get a health component on the object hit
-        Health targetHealth = collision.gameObject.GetComponent<Health>();
-
-        if (targetHealth != null)
+        // Attempt to damage object hit
+        if (collision.gameObject.TryGetComponent<Health>(out var targetHealth))
         {
             targetHealth.TakeDamage(damage);
         }
+
+        // Optional: Add impact effects here (e.g., sparks, blood, sound)
 
         Destroy(gameObject);
     }

@@ -48,7 +48,7 @@ public class ChargingWeapon : MonoBehaviour
 
         if (weaponAnimator != null)
         {
-            weaponAnimator.SetBool(chargingBoolParameter, true); // ?? Play charging animation
+            weaponAnimator.SetBool(chargingBoolParameter, true);
         }
     }
 
@@ -59,7 +59,7 @@ public class ChargingWeapon : MonoBehaviour
 
         if (weaponAnimator != null)
         {
-            weaponAnimator.SetBool(chargingBoolParameter, false); // ? Stop charging animation
+            weaponAnimator.SetBool(chargingBoolParameter, false);
         }
     }
 
@@ -70,8 +70,11 @@ public class ChargingWeapon : MonoBehaviour
 
         if (weaponAnimator != null)
         {
-            weaponAnimator.SetBool(chargingBoolParameter, false); // ? Ensure charging animation stops
+            weaponAnimator.SetBool(chargingBoolParameter, false);
         }
+
+        if (chargedProjectilePrefab == null || firePoint == null || playerCamera == null)
+            return;
 
         GameObject projectile = Instantiate(chargedProjectilePrefab, firePoint.position, Quaternion.identity);
         Rigidbody rb = projectile.GetComponent<Rigidbody>();
@@ -84,6 +87,10 @@ public class ChargingWeapon : MonoBehaviour
         }
 
         Destroy(projectile, bulletLifetime);
+
+        //  Broadcast gunshot event so enemies can react
+        GlobalEventManager.ReportGunshot(firePoint.position);
+
         chargeTimer = 0f;
     }
 }

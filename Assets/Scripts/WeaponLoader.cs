@@ -8,9 +8,11 @@ public class WeaponLoader : MonoBehaviour
 
     void Start()
     {
-        // Find weapons by name among children
         primaryWeapon = transform.Find(GameManager.Instance.primaryWeaponName)?.gameObject;
         secondaryWeapon = transform.Find(GameManager.Instance.secondaryWeaponName)?.gameObject;
+
+        Debug.Log($"Primary weapon: {GameManager.Instance.primaryWeaponName} found? {primaryWeapon != null}");
+        Debug.Log($"Secondary weapon: {GameManager.Instance.secondaryWeaponName} found? {secondaryWeapon != null}");
 
         if (primaryWeapon != null)
         {
@@ -35,7 +37,6 @@ public class WeaponLoader : MonoBehaviour
         {
             Quaternion lookRot = Quaternion.LookRotation(Camera.main.transform.forward);
 
-            // Get offset if it exists
             WeaponInfo info = activeWeapon.GetComponent<WeaponInfo>();
             Quaternion offsetRot = Quaternion.Euler(info != null ? info.rotationOffsetEuler : Vector3.zero);
 
@@ -50,10 +51,26 @@ public class WeaponLoader : MonoBehaviour
     void SwapWeapons()
     {
         if (primaryWeapon == null || secondaryWeapon == null || primaryWeapon == secondaryWeapon)
+        {
+            Debug.LogWarning("SwapWeapons failed: One or both weapons not set or are the same.");
             return;
+        }
 
-        activeWeapon.SetActive(false);
+        if (activeWeapon != null)
+        {
+            activeWeapon.SetActive(false);
+        }
+
         activeWeapon = (activeWeapon == primaryWeapon) ? secondaryWeapon : primaryWeapon;
-        activeWeapon.SetActive(true);
+
+        if (activeWeapon != null)
+        {
+            activeWeapon.SetActive(true);
+            Debug.Log($"Switched to: {activeWeapon.name}");
+        }
+        else
+        {
+            Debug.LogWarning("Active weapon is null after swap!");
+        }
     }
 }
