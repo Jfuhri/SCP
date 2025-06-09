@@ -1,18 +1,11 @@
-using System;
 using UnityEngine;
 
 public static class GlobalEventManager
 {
-    // Gunshot event
-    public static event Action<Vector3> OnGunshot;
+    public static System.Action<Vector3, Object> OnGunshot;
 
-    // Call this to notify all listeners of a gunshot
-    public static void ReportGunshot(Vector3 position)
+    public static void RaiseGunshot(Vector3 position, Object source)
     {
-        OnGunshot?.Invoke(position);
+        OnGunshot?.Invoke(position, source);
     }
-
-    // (Optional) You can add other global events here later
-    // public static event Action<Vector3> OnExplosion;
-    // public static void ReportExplosion(Vector3 position) => OnExplosion?.Invoke(position);
 }

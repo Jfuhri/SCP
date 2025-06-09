@@ -214,11 +214,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shootingRange: 40
-  fireRate: 2
+  fireRate: 1.5
   pelletPrefab: {fileID: 4617986699123245118, guid: 20c3f44b04cd61542ae3291bd310f2f8, type: 3}
   firePoint: {fileID: 4289837067083866728}
   pelletCount: 15
-  spreadAngle: 6
+  spreadAngle: 10
   viewAngle: 120
   viewDistance: 25
   lineOfSightMask:
@@ -226,6 +226,11 @@ MonoBehaviour:
     m_Bits: 1
   patrolRadius: 30
   patrolWaitTime: 3
+  hearingRange: 30
+  biasIncreasePerShot: 0.25
+  biasDecayRate: 0.1
+  alertRadius: 18
+  isAlerted: 0
 --- !u!1 &6016700594283936590
 GameObject:
   m_ObjectHideFlags: 0

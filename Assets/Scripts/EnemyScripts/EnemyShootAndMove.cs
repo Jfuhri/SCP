@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using System.Collections.Generic;
 
 public class EnemyShootAndMove : MonoBehaviour
 {
@@ -17,6 +18,13 @@ public class EnemyShootAndMove : MonoBehaviour
     [Header("Patrol")]
     public float patrolRadius = 30f;
     public float patrolWaitTime = 3f;
+    public float hearingRange = 30f;
+    public float biasIncreasePerShot = 0.25f;
+    public float biasDecayRate = 0.1f;
+    private float patrolBiasWeight = 0f;
+
+    [Header("Backup System")]
+    public float allyBroadcastRadius = 20f;
 
     private Transform player;
     private NavMeshAgent agent;
@@ -26,11 +34,21 @@ public class EnemyShootAndMove : MonoBehaviour
     private bool isPatrolling = true;
     private Vector3 lastKnownPlayerPosition;
 
+    void OnEnable()
+    {
+        GlobalEventManager.OnGunshot += HandleGunshot;
+    }
+
+    void OnDisable()
+    {
+        GlobalEventManager.OnGunshot -= HandleGunshot;
+    }
+
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
         agent = GetComponent<NavMeshAgent>();
-        lastKnownPlayerPosition = transform.position;  // Initialize lastKnownPlayerPosition to own position
+        lastKnownPlayerPosition = transform.position;
         SetNewPatrolPoint();
     }
 
@@ -38,14 +56,17 @@ public class EnemyShootAndMove : MonoBehaviour
     {
         if (player == null) return;
 
+        patrolBiasWeight = Mathf.Max(0f, patrolBiasWeight - biasDecayRate * Time.deltaTime);
         float distance = Vector3.Distance(transform.position, player.position);
 
         if (distance <= shootingRange && IsInFieldOfView() && HasLineOfSight())
         {
-            // Attack mode
             agent.isStopped = true;
             FacePlayer();
             lastKnownPlayerPosition = player.position;
+            patrolBiasWeight = 1f;
+
+            BroadcastToNearbyAllies(lastKnownPlayerPosition);
 
             if (Time.time >= nextFireTime)
             {
@@ -55,15 +76,16 @@ public class EnemyShootAndMove : MonoBehaviour
         }
         else if (IsInFieldOfView() && HasLineOfSight())
         {
-            // Player seen but not in range – chase
             agent.isStopped = false;
             agent.SetDestination(player.position);
             lastKnownPlayerPosition = player.position;
+            patrolBiasWeight = 1f;
             isPatrolling = false;
+
+            BroadcastToNearbyAllies(lastKnownPlayerPosition);
         }
         else
         {
-            // Patrol mode
             PatrolBehavior();
         }
     }
@@ -72,7 +94,6 @@ public class EnemyShootAndMove : MonoBehaviour
     {
         if (!isPatrolling)
         {
-            // Just switched to patrol
             isPatrolling = true;
             patrolWaitTimer = 0f;
             SetNewPatrolPoint();
@@ -93,23 +114,92 @@ public class EnemyShootAndMove : MonoBehaviour
 
     void SetNewPatrolPoint()
     {
-        Vector3 basePoint = (Random.value > 0.6f) ? lastKnownPlayerPosition : transform.position;
-        Vector3 randomDirection = Random.insideUnitSphere * patrolRadius;
-        randomDirection.y = 0f; // Flatten to ground level
+        Vector3 basePoint = Vector3.Lerp(transform.position, lastKnownPlayerPosition, patrolBiasWeight);
+        Vector3 randomOffset = Random.insideUnitSphere * patrolRadius * (1f - patrolBiasWeight);
+        randomOffset.y = 0f;
 
-        Vector3 candidatePoint = basePoint + randomDirection;
+        Vector3 candidatePoint = basePoint + randomOffset;
 
         if (NavMesh.SamplePosition(candidatePoint, out NavMeshHit hit, patrolRadius, NavMesh.AllAreas))
         {
             currentPatrolTarget = hit.position;
             agent.SetDestination(currentPatrolTarget);
         }
-        else
+    }
+
+    void Shoot()
+    {
+        if (bulletPrefab && firePoint)
         {
-            // Fallback: stay in place if no valid point found
-            currentPatrolTarget = transform.position;
-            agent.SetDestination(currentPatrolTarget);
+            Vector3 direction = (player.position - firePoint.position).normalized;
+            Quaternion lookRotation = Quaternion.LookRotation(direction);
+            Instantiate(bulletPrefab, firePoint.position, lookRotation);
+
+            GlobalEventManager.RaiseGunshot(firePoint.position, this);
         }
+    }
+
+    void HandleGunshot(Vector3 gunshotPosition, Object source)
+    {
+        if (source == this) return;
+
+        if (Vector3.Distance(transform.position, gunshotPosition) <= hearingRange)
+        {
+            lastKnownPlayerPosition = gunshotPosition;
+            patrolBiasWeight += biasIncreasePerShot;
+            patrolBiasWeight = Mathf.Clamp01(patrolBiasWeight);
+
+            if (isPatrolling)
+            {
+                SetNewPatrolPoint();
+            }
+        }
+    }
+
+    public void OnHitByPlayer(Vector3 hitOrigin)
+    {
+        lastKnownPlayerPosition = hitOrigin;
+        patrolBiasWeight = 1f;
+        isPatrolling = true;
+        SetNewPatrolPoint();
+
+        BroadcastToNearbyAllies(hitOrigin);
+
+        if (player != null)
+        {
+            FacePlayer();
+            if (Time.time >= nextFireTime)
+            {
+                Shoot();
+                nextFireTime = Time.time + 1f / fireRate;
+            }
+        }
+    }
+
+    void BroadcastToNearbyAllies(Vector3 targetPosition)
+    {
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, allyBroadcastRadius);
+        foreach (var col in hitColliders)
+        {
+            if (col.gameObject != this.gameObject && col.CompareTag("Enemy"))
+            {
+                EnemyShootAndMove ally = col.GetComponent<EnemyShootAndMove>();
+                if (ally != null)
+                {
+                    ally.ReceiveBackupCall(targetPosition);
+                    Debug.Log($"{name} broadcasted to {ally.name} about player at {targetPosition}");
+                }
+            }
+        }
+    }
+
+    public void ReceiveBackupCall(Vector3 targetPosition)
+    {
+        lastKnownPlayerPosition = targetPosition;
+        patrolBiasWeight = 1f;
+        isPatrolling = true;
+        SetNewPatrolPoint();
+        Debug.Log($"{name} received backup call and is moving toward {targetPosition}");
     }
 
     bool HasLineOfSight()
@@ -136,34 +226,25 @@ public class EnemyShootAndMove : MonoBehaviour
         if (direction != Vector3.zero)
         {
             Quaternion lookRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
-        }
-    }
-
-    void Shoot()
-    {
-        if (bulletPrefab && firePoint)
-        {
-            Vector3 direction = (player.position - firePoint.position).normalized;
-            Quaternion lookRotation = Quaternion.LookRotation(direction);
-            Instantiate(bulletPrefab, firePoint.position, lookRotation);
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 10f);
         }
     }
 
     void OnDrawGizmosSelected()
     {
-        if (player == null) return;
-
-        Gizmos.color = Color.cyan;
+        Gizmos.color = Color.yellow;
         Vector3 leftBoundary = Quaternion.Euler(0, -viewAngle / 2f, 0) * transform.forward;
         Vector3 rightBoundary = Quaternion.Euler(0, viewAngle / 2f, 0) * transform.forward;
         Gizmos.DrawRay(transform.position, leftBoundary * viewDistance);
         Gizmos.DrawRay(transform.position, rightBoundary * viewDistance);
 
-        Gizmos.color = Color.green;
-        Gizmos.DrawLine(transform.position, player.position);
-
-        Gizmos.color = Color.yellow;
+        Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(currentPatrolTarget, 1f);
+
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawWireSphere(transform.position, hearingRange);
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, allyBroadcastRadius);
     }
 }

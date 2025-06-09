@@ -89,7 +89,8 @@ public class ChargingWeapon : MonoBehaviour
         Destroy(projectile, bulletLifetime);
 
         //  Broadcast gunshot event so enemies can react
-        GlobalEventManager.ReportGunshot(firePoint.position);
+        GlobalEventManager.RaiseGunshot(transform.position, this);
+
 
         chargeTimer = 0f;
     }

@@ -43,7 +43,7 @@ public class FirstPersonShooter : MonoBehaviour
         if (muzzleFlashSpawner != null)
             muzzleFlashSpawner.SpawnFlash();
 
-        //  Broadcast the gunshot event
-        GlobalEventManager.ReportGunshot(bulletSpawnPoint.position);
+        // Broadcast the gunshot event with the source object
+        GlobalEventManager.RaiseGunshot(transform.position, this);
     }
 }

@@ -3,6 +3,7 @@ using UnityEngine.SceneManagement;
 
 public class Health : MonoBehaviour
 {
+    [Header("Health Settings")]
     public float maxHealth = 100f;
     private float currentHealth;
 
@@ -11,9 +12,25 @@ public class Health : MonoBehaviour
         currentHealth = maxHealth;
     }
 
-    public void TakeDamage(float amount)
+    public void TakeDamage(float amount, Vector3 hitOrigin)
     {
         currentHealth -= amount;
+
+        // If it's not the player, notify any enemy AI script
+        if (!CompareTag("Player"))
+        {
+            var shooterAI = GetComponent<EnemyShootAndMove>();
+            if (shooterAI != null)
+            {
+                shooterAI.OnHitByPlayer(hitOrigin);
+            }
+
+            var shotgunAI = GetComponent<EnemyShotgunAndMove>();
+            if (shotgunAI != null)
+            {
+                shotgunAI.OnHitByPlayer(hitOrigin);
+            }
+        }
 
         if (currentHealth <= 0)
         {
@@ -23,26 +40,16 @@ public class Health : MonoBehaviour
 
     private void Die()
     {
-        // Example behavior: destroy enemy or reload scene for player
         if (CompareTag("Player"))
         {
-            // Load game over scene for player death
             SceneManager.LoadScene("GameOver");
         }
         else
         {
-            // Destroy enemy object
             Destroy(gameObject);
         }
     }
 
-    public float GetHealth()
-    {
-        return currentHealth;
-    }
-
-    public float GetMaxHealth()
-    {
-        return maxHealth;
-    }
+    public float GetHealth() => currentHealth;
+    public float GetMaxHealth() => maxHealth;
 }

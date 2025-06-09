@@ -6,7 +6,7 @@ public class ShotgunShooter : MonoBehaviour
     public Transform pelletSpawnPoint;
     public Camera playerCamera;
     public int pelletCount = 8;
-    public float spreadAngle = 5f; // Degrees
+    public float spreadAngle = 5f;
     public float pelletForce = 700f;
     public float shootCooldown = 1f;
     public MuzzleFlashSpawner muzzleFlashSpawner;
@@ -27,17 +27,19 @@ public class ShotgunShooter : MonoBehaviour
         for (int i = 0; i < pelletCount; i++)
         {
             Vector3 direction = GetSpreadDirection();
-
             GameObject pellet = Instantiate(pelletPrefab, pelletSpawnPoint.position, Quaternion.identity);
             Rigidbody rb = pellet.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                rb.linearVelocity = direction * pelletForce * Time.fixedDeltaTime;
+                rb.linearVelocity = direction * pelletForce;  // FIXED: no deltaTime, use velocity
                 pellet.transform.forward = direction;
             }
-            if (muzzleFlashSpawner != null)
-                muzzleFlashSpawner.SpawnFlash();
         }
+
+        if (muzzleFlashSpawner != null)
+            muzzleFlashSpawner.SpawnFlash();
+
+        GlobalEventManager.RaiseGunshot(transform.position, this);
     }
 
     Vector3 GetSpreadDirection()

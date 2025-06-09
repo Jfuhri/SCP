@@ -12,13 +12,13 @@ public class AutoDestroy : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        // Check if the object has a health script (you can replace this with your own damage logic)
         var target = collision.gameObject.GetComponent<Health>();
         if (target != null)
         {
-            target.TakeDamage(damage);
+            // Pass damage and the position of the bullet as the hit origin
+            target.TakeDamage(damage, transform.position);
         }
 
-        Destroy(gameObject); // destroy bullet on impact
+        Destroy(gameObject);
     }
 }

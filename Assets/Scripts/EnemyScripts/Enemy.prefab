@@ -349,7 +349,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8d2af94d6e2dc74aaa234ea486b5481, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shootingRange: 0
+  shootingRange: 50
   fireRate: 1.5
   bulletPrefab: {fileID: 2148095775127295847, guid: bde5580caf2bb394db7355f6ca883fcb, type: 3}
   firePoint: {fileID: 147843717650879474}
@@ -360,6 +360,10 @@ MonoBehaviour:
     m_Bits: 1
   patrolRadius: 30
   patrolWaitTime: 3
+  hearingRange: 30
+  biasIncreasePerShot: 0.25
+  biasDecayRate: 0.1
+  allyBroadcastRadius: 18
 --- !u!1 &7305247438795223038
 GameObject:
   m_ObjectHideFlags: 0
